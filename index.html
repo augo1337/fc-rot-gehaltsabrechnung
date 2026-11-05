@@ -261,6 +261,7 @@
           <input type="file" accept=".json" onchange="importAppData(event)" style="display:none;">
         </label>
         <button class="btn btn-danger" onclick="resetData()">🗑 Alle Daten zurücksetzen</button>
+        <button class="btn btn-secondary" id="btn-logout" style="display:none;" onclick="doLogout()">🔒 Abmelden</button>
       </div>
       <p class="text-muted" style="margin-top:.75rem; font-size:.8125rem;">
         Export/Import dient der Datensicherung und Weitergabe zwischen Geräten.
@@ -417,11 +418,47 @@
 <!-- ── TOAST ── -->
 <div id="toast"></div>
 
+<!-- ── LOGIN OVERLAY (nur im Cloud-Modus) ── -->
+<div id="login-overlay" style="display:none; position:fixed; inset:0; z-index:200;
+     background:linear-gradient(160deg,#15803D,#0b4a24); align-items:center; justify-content:center; padding:1rem;">
+  <div style="background:#fff; border-radius:.75rem; padding:2rem; max-width:360px; width:100%;
+       box-shadow:0 20px 60px rgba(0,0,0,.35); text-align:center;">
+    <img src="logo.jpeg" alt="FC ROT" style="width:72px; height:72px; border-radius:50%; object-fit:cover; margin-bottom:1rem;">
+    <h2 style="font-size:1.125rem; margin-bottom:.25rem; color:#15803D;">FC ROT Prämienabrechnung</h2>
+    <p style="font-size:.8125rem; color:#6B7280; margin-bottom:1.25rem;">Bitte mit dem gemeinsamen Passwort anmelden.</p>
+    <input type="password" id="login-password" placeholder="Passwort"
+           style="width:100%; padding:.6rem .75rem; border:1px solid #D1D5DB; border-radius:.5rem; font-size:.95rem; margin-bottom:.75rem;"
+           onkeydown="if(event.key==='Enter') doLogin()">
+    <div id="login-error" style="display:none; color:#991B1B; font-size:.8125rem; margin-bottom:.75rem;"></div>
+    <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="doLogin()">Anmelden</button>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 'use strict';
+
+// ═══════════════════════════════════════════════════════════
+//  SUPABASE-KONFIGURATION
+//  Hier nach dem Anlegen des Supabase-Projekts eintragen.
+//  Solange die Platzhalter stehen, läuft die App im LOKALEN Modus
+//  (Daten nur im Browser). Mit gültigen Werten → CLOUD-Modus
+//  (zentrale Daten + gemeinsames Login, alle 3 sehen dasselbe).
+// ═══════════════════════════════════════════════════════════
+const SUPABASE_URL      = 'DEINE_SUPABASE_URL';        // z.B. https://abcd1234.supabase.co
+const SUPABASE_ANON_KEY = 'DEIN_SUPABASE_ANON_KEY';    // "anon public" Key aus Project Settings → API
+const SHARED_LOGIN_EMAIL = 'team@fcrot.app';           // fester Login-User (Passwort = gemeinsam, in Supabase angelegt)
+
+const CLOUD = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
+let sb = null;
+if (CLOUD && window.supabase) {
+  sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+let _authed = false;
+let _suppressRealtime = '';   // JSON des zuletzt selbst gespeicherten Stands (Echo ignorieren)
 
 // ─── State ────────────────────────────────────────────────
 const STORE_KEY = 'fcrot_praemien_v1';
@@ -488,7 +525,114 @@ function load() {
 }
 
 function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(S));   // lokaler Cache / lokaler Modus
+  if (CLOUD && sb && _authed) scheduleCloudPush();
+}
+
+// ─── Cloud-Persistenz (Supabase) ──────────────────────────
+let _pushTimer = null;
+function scheduleCloudPush() {
+  clearTimeout(_pushTimer);
+  _pushTimer = setTimeout(pushToCloud, 400);   // leichtes Debounce bei schnellen Eingaben
+}
+
+async function pushToCloud() {
+  if (!sb) return;
+  const snapshot = JSON.stringify(S);
+  _suppressRealtime = snapshot;   // eigenes Echo beim Realtime-Event ignorieren
+  const { error } = await sb.from('app_state')
+    .update({ data: S, updated_at: new Date().toISOString() })
+    .eq('id', 1);
+  if (error) {
+    console.error('Cloud-Speichern fehlgeschlagen:', error);
+    toast('⚠️ Speichern in der Cloud fehlgeschlagen');
+  }
+}
+
+async function loadCloud() {
+  const { data, error } = await sb.from('app_state').select('data').eq('id', 1).single();
+  if (error) { console.error('Cloud-Laden fehlgeschlagen:', error); return; }
+  if (data && data.data && Object.keys(data.data).length) {
+    S = data.data;
+  }
+  if (pruneBlockedCoaches()) pushToCloud();
   localStorage.setItem(STORE_KEY, JSON.stringify(S));
+}
+
+function subscribeRealtime() {
+  if (!sb) return;
+  sb.channel('app_state_rt')
+    .on('postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'app_state' },
+        payload => {
+          const incoming = payload.new && payload.new.data;
+          if (!incoming) return;
+          const incomingStr = JSON.stringify(incoming);
+          if (incomingStr === _suppressRealtime) return;          // eigenes Echo
+          if (incomingStr === JSON.stringify(S)) return;          // identisch
+          S = incoming;
+          pruneBlockedCoaches();
+          localStorage.setItem(STORE_KEY, JSON.stringify(S));
+          loadSettingsUI();
+          renderPlayers();
+          renderMatches();
+          toast('🔄 Daten von anderem Nutzer aktualisiert');
+        })
+    .subscribe();
+}
+
+// ─── Login (gemeinsames Passwort) ─────────────────────────
+async function doLogin() {
+  const pw = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!pw) { errEl.textContent = 'Bitte Passwort eingeben.'; errEl.style.display = 'block'; return; }
+
+  const { error } = await sb.auth.signInWithPassword({ email: SHARED_LOGIN_EMAIL, password: pw });
+  if (error) {
+    errEl.textContent = 'Passwort falsch oder Anmeldung fehlgeschlagen.';
+    errEl.style.display = 'block';
+    return;
+  }
+  await afterLogin();
+}
+
+function showLogin() { document.getElementById('login-overlay').style.display = 'flex'; }
+function hideLogin() { document.getElementById('login-overlay').style.display = 'none'; }
+
+async function afterLogin() {
+  _authed = true;
+  hideLogin();
+  await loadCloud();
+  loadSettingsUI();
+  renderPlayers();
+  renderMatches();
+  subscribeRealtime();
+  const lo = document.getElementById('btn-logout');
+  if (lo) lo.style.display = '';
+}
+
+async function doLogout() {
+  if (sb) await sb.auth.signOut();
+  location.reload();
+}
+
+// ─── Boot ─────────────────────────────────────────────────
+async function boot() {
+  if (!CLOUD) {                 // Lokaler Modus (wie bisher)
+    load();
+    loadSettingsUI();
+    return;
+  }
+  if (!sb) {                    // Cloud konfiguriert, aber Supabase-Lib nicht geladen
+    alert('Supabase-Bibliothek konnte nicht geladen werden (Internetverbindung?).');
+    load();
+    loadSettingsUI();
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) await afterLogin();
+  else showLogin();
 }
 
 // ─── Helpers ──────────────────────────────────────────────
@@ -1204,8 +1348,15 @@ function importAppData(event) {
 function resetData() {
   if (!confirm('⚠️ Alle Daten wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
   if (!confirm('Bitte bestätigen: Alle Spieler und Spieltage werden gelöscht.')) return;
-  localStorage.removeItem(STORE_KEY);
-  location.reload();
+  if (CLOUD && sb && _authed) {
+    S = { config: S.config, players: [], matches: [] };
+    save();
+    renderPlayers(); renderMatches(); loadSettingsUI();
+    toast('Alle Daten zurückgesetzt ✓');
+  } else {
+    localStorage.removeItem(STORE_KEY);
+    location.reload();
+  }
 }
 
 // ─── Modal helpers ────────────────────────────────────────
@@ -1223,8 +1374,7 @@ function toast(msg) {
 }
 
 // ─── Init ─────────────────────────────────────────────────
-load();
-loadSettingsUI();
+boot();
 </script>
 </body>
 </html>
