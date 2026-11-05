@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FC ROT – Prämienabrechnung</title>
+  <style>
+    :root {
+      --red: #C8102E;
+      --red-dark: #9E0D25;
+      --gray-50: #F9FAFB;
+      --gray-100: #F3F4F6;
+      --gray-200: #E5E7EB;
+      --gray-300: #D1D5DB;
+      --gray-500: #6B7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --green: #059669;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font); background: var(--gray-100); color: var(--gray-900); min-height: 100vh; }
+
+    /* ── Header ── */
+    .header {
+      background: var(--red);
+      color: #fff;
+      padding: 0.875rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .header-logo { font-size: 1.75rem; line-height: 1; }
+    .header h1 { font-size: 1.125rem; font-weight: 700; }
+    .header-sub { font-size: 0.8rem; opacity: .8; margin-top: 1px; }
+    .header-season { margin-left: auto; font-size: 0.875rem; opacity: .9; white-space: nowrap; }
+
+    /* ── Tabs ── */
+    .tabs { background: #fff; border-bottom: 1px solid var(--gray-200); display: flex; padding: 0 1rem; }
+    .tab {
+      padding: .75rem 1.125rem; font-size: .875rem; font-weight: 500;
+      cursor: pointer; border-bottom: 3px solid transparent; color: var(--gray-500);
+      transition: color .15s, border-color .15s; user-select: none;
+    }
+    .tab:hover { color: var(--red); }
+    .tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+    /* ── Content ── */
+    .content { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; }
+
+    /* ── Cards ── */
+    .card { background: #fff; border: 1px solid var(--gray-200); border-radius: .5rem; padding: 1.25rem; margin-bottom: 1rem; }
+    .card-title { font-size: .75rem; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 1rem; }
+
+    /* ── Forms ── */
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: .875rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: .3rem; }
+    label { font-size: .8125rem; font-weight: 500; color: var(--gray-700); }
+    input, select, textarea {
+      padding: .5rem .75rem; border: 1px solid var(--gray-300); border-radius: .375rem;
+      font-size: .875rem; color: var(--gray-900); background: #fff;
+      transition: border-color .15s, box-shadow .15s; font-family: var(--font);
+    }
+    input:focus, select:focus { outline: none; border-color: var(--red); box-shadow: 0 0 0 3px rgba(200,16,46,.12); }
+    input[type="number"] { -moz-appearance: textfield; }
+
+    /* ── Buttons ── */
+    .btn {
+      padding: .5rem 1rem; border-radius: .375rem; font-size: .875rem;
+      font-weight: 500; cursor: pointer; border: none; display: inline-flex;
+      align-items: center; gap: .375rem; transition: all .15s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--red); color: #fff; }
+    .btn-primary:hover { background: var(--red-dark); }
+    .btn-secondary { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-300); }
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-danger { background: #FEE2E2; color: #991B1B; }
+    .btn-danger:hover { background: #FECACA; }
+    .btn-sm { padding: .35rem .75rem; font-size: .8125rem; }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    th { text-align: left; padding: .625rem .75rem; background: var(--gray-50); font-weight: 600; font-size: .8rem; color: var(--gray-500); border-bottom: 1px solid var(--gray-200); white-space: nowrap; }
+    td { padding: .625rem .75rem; border-bottom: 1px solid var(--gray-100); color: var(--gray-700); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #FAFAFA; }
+
+    /* ── Badges ── */
+    .badge { display: inline-flex; align-items: center; padding: .15rem .55rem; border-radius: 999px; font-size: .75rem; font-weight: 600; }
+    .badge-win { background: #D1FAE5; color: #065F46; }
+    .badge-draw { background: #FEF3C7; color: #92400E; }
+    .badge-loss { background: #FEE2E2; color: #991B1B; }
+    .badge-active { background: #D1FAE5; color: #065F46; }
+
+    /* ── Utilities ── */
+    .flex { display: flex; } .gap-2 { gap: .5rem; } .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; } .ml-auto { margin-left: auto; }
+    .text-right { text-align: right; } .text-center { text-align: center; }
+    .font-bold { font-weight: 600; } .text-muted { color: var(--gray-500); font-size: .875rem; }
+    .mb-0 { margin-bottom: 0 !important; }
+
+    /* ── Lineup status selector ── */
+    .lineup-row { padding: .5rem 0; border-bottom: 1px solid var(--gray-100); display: grid; grid-template-columns: 1fr 1fr auto; gap: .625rem; align-items: center; }
+    .lineup-row:last-child { border-bottom: none; }
+    .lineup-name { font-size: .875rem; font-weight: 500; }
+    .lineup-minute { width: 72px; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100;
+      display: flex; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal {
+      background: #fff; border-radius: .5rem; padding: 1.5rem;
+      max-width: 540px; width: 100%; max-height: 90vh; overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
+    }
+    .modal-title { font-size: 1rem; font-weight: 700; margin-bottom: 1.25rem; }
+    .modal-large { max-width: 680px; }
+
+    /* ── Payroll summary ── */
+    .pay-total { background: #FFF8F8; border-top: 2px solid var(--red) !important; }
+    .pay-amount { color: var(--red); font-weight: 700; }
+
+    /* ── Empty state ── */
+    .empty { padding: 2.5rem; text-align: center; color: var(--gray-500); font-size: .9rem; }
+
+    /* ── Toast ── */
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem; background: #1F2937; color: #fff;
+      padding: .75rem 1.25rem; border-radius: .5rem; font-size: .875rem;
+      z-index: 999; box-shadow: 0 4px 16px rgba(0,0,0,.25); opacity: 0;
+      transition: opacity .25s; pointer-events: none;
+    }
+
+    /* ── PRINT ── */
+    @media print {
+      body > * { display: none !important; }
+      #print-area { display: block !important; }
+    }
+    #print-area { display: none; }
+
+    @page { margin: 1.5cm; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     HEADER
+═══════════════════════════════════════════════ -->
+<div class="header">
+  <div class="header-logo">⚽</div>
+  <div>
+    <h1>FC ROT – Prämienabrechnung</h1>
+    <div class="header-sub">Spieler-Prämien &amp; Abrechnung</div>
+  </div>
+  <div class="header-season" id="header-season">Saison 2026/27</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     TABS
+═══════════════════════════════════════════════ -->
+<div class="tabs">
+  <div class="tab active" data-tab="settings">⚙️ Einstellungen</div>
+  <div class="tab" data-tab="players">👥 Spieler</div>
+  <div class="tab" data-tab="matches">📅 Spieltage</div>
+  <div class="tab" data-tab="payroll">💰 Abrechnung</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     CONTENT
+═══════════════════════════════════════════════ -->
+<div class="content">
+
+  <!-- ── TAB: EINSTELLUNGEN ── -->
+  <div id="tab-settings">
+    <div class="card">
+      <div class="card-title">Saison-Grundprämien</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Saison</label>
+          <input type="text" id="cfg-season" placeholder="2026-27">
+        </div>
+        <div class="form-group">
+          <label>Siegprämie (€)</label>
+          <input type="number" id="cfg-win" min="0" step="0.50">
+        </div>
+        <div class="form-group">
+          <label>Unentschieden-Prämie (€)</label>
+          <input type="number" id="cfg-draw" min="0" step="0.50">
+        </div>
+        <div class="form-group">
+          <label>Bankprämie – ganzes Spiel (€)</label>
+          <input type="number" id="cfg-bench" min="0" step="0.50">
+        </div>
+      </div>
+      <p class="text-muted" style="margin-bottom:1rem; font-size:.8125rem;">
+        Einwechslung <strong>ab Minute 46</strong>: jeweils 50 % der Einsatz- und Punktprämie.
+        Einwechslung <strong>vor Minute 46</strong>: volle Prämien.
+      </p>
+      <button class="btn btn-primary" onclick="saveConfig()">Einstellungen speichern</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">FuPa Integration</div>
+      <div class="form-row">
+        <div class="form-group" style="grid-column: span 2;">
+          <label>Team-Slug (FuPa)</label>
+          <input type="text" id="cfg-team-slug" placeholder="fc-rot-m1-2026-27">
+          <span class="text-muted" style="font-size:.75rem;">Jede Saison aktualisieren, z.B. fc-rot-m1-2026-27</span>
+        </div>
+        <div class="form-group" style="grid-column: span 2;">
+          <label>Club-Slug (FuPa)</label>
+          <input type="text" id="cfg-club-slug" placeholder="fc-rot">
+        </div>
+      </div>
+      <div class="flex gap-2 items-center" style="flex-wrap:wrap; margin-top:.5rem;">
+        <button class="btn btn-primary" onclick="loadFupaFromRepo()">🔄 FuPa-Daten laden</button>
+        <button class="btn btn-secondary" onclick="saveConfig()">Speichern</button>
+        <label class="btn btn-secondary" style="cursor:pointer;">
+          📁 FuPa-JSON manuell importieren
+          <input type="file" accept=".json" onchange="importFupaFile(event)" style="display:none;">
+        </label>
+        <span class="text-muted" id="fupa-last-sync" style="font-size:.8125rem;"></span>
+      </div>
+      <p class="text-muted" style="margin-top:.875rem; font-size:.8125rem; line-height:1.5;">
+        <strong>„FuPa-Daten laden"</strong> holt die von GitHub Actions erzeugte
+        <code>data/fupa.json</code> direkt (funktioniert auf GitHub Pages).
+        Alternativ die Datei manuell hochladen. Spieler werden automatisch
+        über Name oder FuPa-Slug zugeordnet.
+      </p>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Daten verwalten</div>
+      <div class="flex gap-2" style="flex-wrap:wrap;">
+        <button class="btn btn-secondary" onclick="exportData()">⬇️ Alle Daten exportieren</button>
+        <label class="btn btn-secondary" style="cursor:pointer;">
+          ⬆️ Daten importieren
+          <input type="file" accept=".json" onchange="importAppData(event)" style="display:none;">
+        </label>
+        <button class="btn btn-danger" onclick="resetData()">🗑 Alle Daten zurücksetzen</button>
+      </div>
+      <p class="text-muted" style="margin-top:.75rem; font-size:.8125rem;">
+        Export/Import dient der Datensicherung und Weitergabe zwischen Geräten.
+      </p>
+    </div>
+  </div>
+
+  <!-- ── TAB: SPIELER ── -->
+  <div id="tab-players" style="display:none;">
+    <div class="card">
+      <div class="flex justify-between items-center mb-0" style="margin-bottom:0;">
+        <div class="card-title" style="margin-bottom:0;">Kader verwalten</div>
+        <button class="btn btn-primary btn-sm" onclick="openPlayerModal()">+ Spieler hinzufügen</button>
+      </div>
+      <div class="table-wrap" style="margin-top:1rem;">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th class="text-right">Einsatzprämie</th>
+              <th>FuPa-Slug</th>
+              <th>Status</th>
+              <th style="width:130px;"></th>
+            </tr>
+          </thead>
+          <tbody id="players-tbody"></tbody>
+        </table>
+        <div id="players-empty" class="empty" style="display:none;">
+          Noch keine Spieler angelegt. Klicke auf "+ Spieler hinzufügen".
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── TAB: SPIELTAGE ── -->
+  <div id="tab-matches" style="display:none;">
+    <div class="card">
+      <div class="card-title">Neuen Spieltag eintragen</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Datum</label>
+          <input type="date" id="m-date">
+        </div>
+        <div class="form-group">
+          <label>Gegner</label>
+          <input type="text" id="m-opponent" placeholder="SV Muster">
+        </div>
+        <div class="form-group">
+          <label>Heim/Auswärts</label>
+          <select id="m-venue">
+            <option value="home">🏠 Heimspiel</option>
+            <option value="away">✈️ Auswärtsspiel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Ergebnis</label>
+          <select id="m-result">
+            <option value="win">Sieg</option>
+            <option value="draw">Unentschieden</option>
+            <option value="loss">Niederlage</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Spielstand (optional)</label>
+          <input type="text" id="m-score" placeholder="3:1">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="addMatch()">Spieltag erstellen</button>
+    </div>
+
+    <div id="matches-list"></div>
+  </div>
+
+  <!-- ── TAB: ABRECHNUNG ── -->
+  <div id="tab-payroll" style="display:none;">
+    <div class="card">
+      <div class="card-title">Abrechnungszeitraum</div>
+      <div class="form-row" style="max-width: 400px;">
+        <div class="form-group">
+          <label>Von</label>
+          <input type="date" id="pay-from">
+        </div>
+        <div class="form-group">
+          <label>Bis</label>
+          <input type="date" id="pay-to">
+        </div>
+      </div>
+      <button class="btn btn-primary" onclick="calculatePayroll()">💰 Auszahlung berechnen</button>
+    </div>
+    <div id="payroll-results"></div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: SPIELER
+═══════════════════════════════════════════════ -->
+<div id="modal-player" class="modal-overlay" style="display:none;" onclick="overlayClose(event,this)">
+  <div class="modal">
+    <div class="modal-title" id="modal-player-title">Spieler hinzufügen</div>
+    <input type="hidden" id="modal-player-id">
+    <div class="form-group" style="margin-bottom:.875rem;">
+      <label>Name *</label>
+      <input type="text" id="modal-player-name" placeholder="Max Mustermann">
+    </div>
+    <div class="form-group" style="margin-bottom:.875rem;">
+      <label>Individuelle Einsatzprämie (€) *</label>
+      <input type="number" id="modal-player-praemie" min="0" step="0.50" placeholder="30">
+    </div>
+    <div class="form-group" style="margin-bottom:1.5rem;">
+      <label>FuPa-Slug (optional)</label>
+      <input type="text" id="modal-player-slug" placeholder="moritz-strompf-56339">
+      <span class="text-muted" style="font-size:.75rem;">Für automatische FuPa-Zuordnung beim Import</span>
+    </div>
+    <div class="flex gap-2">
+      <button class="btn btn-primary" onclick="savePlayer()">Speichern</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-player')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     MODAL: AUFSTELLUNG
+═══════════════════════════════════════════════ -->
+<div id="modal-lineup" class="modal-overlay" style="display:none;" onclick="overlayClose(event,this)">
+  <div class="modal modal-large">
+    <div class="modal-title">Aufstellung eintragen</div>
+    <div class="text-muted" id="lineup-info" style="margin-bottom:1rem; font-size:.875rem;"></div>
+    <input type="hidden" id="lineup-match-id">
+
+    <div style="font-size:.75rem; font-weight:700; text-transform:uppercase; color:var(--gray-500); display:grid; grid-template-columns:1fr 1fr auto; gap:.625rem; padding:.375rem 0; border-bottom:2px solid var(--gray-200); margin-bottom:.25rem;">
+      <span>Spieler</span><span>Status</span><span style="width:72px;">Min.*</span>
+    </div>
+    <div id="lineup-players"></div>
+
+    <p class="text-muted" style="font-size:.75rem; margin-top:.75rem;">* Einwechselminute (optional, für genaue Halbzeitregel)</p>
+    <div class="flex gap-2" style="margin-top:1.25rem;">
+      <button class="btn btn-primary" onclick="saveLineup()">Aufstellung speichern</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-lineup')">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── PRINT AREA ── -->
+<div id="print-area"></div>
+
+<!-- ── TOAST ── -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+// ─── State ────────────────────────────────────────────────
+const STORE_KEY = 'fcrot_praemien_v1';
+
+let S = {
+  config: {
+    season:    '2026-27',
+    winBonus:  50,
+    drawBonus: 20,
+    benchBonus: 10,
+    teamSlug:  'fc-rot-m1-2026-27',
+    clubSlug:  'fc-rot',
+    fupaLastSync: null
+  },
+  players: [],
+  // { id, name, einsatzpraemie, fupaSlug, active }
+  matches: []
+  // { id, fupaId?, date, opponent, isHome, result, score, participants: [{playerId, status, minuteIn}] }
+};
+
+function load() {
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw) S = JSON.parse(raw);
+  } catch (_) {}
+}
+
+function save() {
+  localStorage.setItem(STORE_KEY, JSON.stringify(S));
+}
+
+// ─── Helpers ──────────────────────────────────────────────
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
+}
+
+function esc(s) {
+  return String(s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  const [y, m, dd] = d.split('-');
+  return `${dd}.${m}.${y}`;
+}
+
+function fmtEur(n) {
+  return Number(n || 0).toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €';
+}
+
+// ─── Tabs ─────────────────────────────────────────────────
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+});
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+  ['settings','players','matches','payroll'].forEach(t => {
+    document.getElementById('tab-' + t).style.display = t === name ? 'block' : 'none';
+  });
+  if (name === 'players') renderPlayers();
+  if (name === 'matches') renderMatches();
+  if (name === 'payroll') initPayroll();
+}
+
+// ─── Settings ─────────────────────────────────────────────
+function loadSettingsUI() {
+  const c = S.config;
+  setVal('cfg-season',    c.season);
+  setVal('cfg-win',       c.winBonus);
+  setVal('cfg-draw',      c.drawBonus);
+  setVal('cfg-bench',     c.benchBonus);
+  setVal('cfg-team-slug', c.teamSlug);
+  setVal('cfg-club-slug', c.clubSlug);
+  document.getElementById('header-season').textContent = `Saison ${c.season}`;
+  document.getElementById('fupa-last-sync').textContent =
+    c.fupaLastSync
+      ? `Zuletzt synchronisiert: ${new Date(c.fupaLastSync).toLocaleDateString('de-DE')}`
+      : '';
+}
+
+function saveConfig() {
+  const c = S.config;
+  c.season     = getVal('cfg-season');
+  c.winBonus   = parseFloat(getVal('cfg-win'))   || 0;
+  c.drawBonus  = parseFloat(getVal('cfg-draw'))  || 0;
+  c.benchBonus = parseFloat(getVal('cfg-bench')) || 0;
+  c.teamSlug   = getVal('cfg-team-slug');
+  c.clubSlug   = getVal('cfg-club-slug');
+  save();
+  document.getElementById('header-season').textContent = `Saison ${c.season}`;
+  toast('Einstellungen gespeichert ✓');
+}
+
+function getVal(id) { return document.getElementById(id).value.trim(); }
+function setVal(id, v) { document.getElementById(id).value = v ?? ''; }
+
+// ─── Players ──────────────────────────────────────────────
+function renderPlayers() {
+  const list = S.players.filter(p => p.active !== false);
+  const tbody = document.getElementById('players-tbody');
+  const empty = document.getElementById('players-empty');
+  empty.style.display = list.length ? 'none' : '';
+
+  tbody.innerHTML = list.map(p => `
+    <tr>
+      <td class="font-bold">${esc(p.name)}</td>
+      <td class="text-right">${fmtEur(p.einsatzpraemie)}</td>
+      <td class="text-muted" style="font-size:.8125rem;">${esc(p.fupaSlug || '—')}</td>
+      <td><span class="badge badge-active">Aktiv</span></td>
+      <td class="text-right">
+        <button class="btn btn-secondary btn-sm" onclick="openPlayerModal('${p.id}')">Bearbeiten</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:.25rem;" onclick="deletePlayer('${p.id}')">Löschen</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function openPlayerModal(id) {
+  const p = id ? S.players.find(x => x.id === id) : null;
+  document.getElementById('modal-player-title').textContent = p ? 'Spieler bearbeiten' : 'Spieler hinzufügen';
+  setVal('modal-player-id',     p?.id     || '');
+  setVal('modal-player-name',   p?.name   || '');
+  setVal('modal-player-praemie',p?.einsatzpraemie ?? '');
+  setVal('modal-player-slug',   p?.fupaSlug || '');
+  document.getElementById('modal-player').style.display = 'flex';
+}
+
+function savePlayer() {
+  const name    = getVal('modal-player-name');
+  const praemie = parseFloat(getVal('modal-player-praemie')) || 0;
+  const slug    = getVal('modal-player-slug');
+  const id      = getVal('modal-player-id');
+  if (!name) { alert('Bitte Namen eingeben.'); return; }
+
+  if (id) {
+    const p = S.players.find(x => x.id === id);
+    if (p) { p.name = name; p.einsatzpraemie = praemie; p.fupaSlug = slug; }
+  } else {
+    S.players.push({ id: uid(), name, einsatzpraemie: praemie, fupaSlug: slug, active: true });
+  }
+  save();
+  closeModal('modal-player');
+  renderPlayers();
+  toast('Spieler gespeichert ✓');
+}
+
+function deletePlayer(id) {
+  if (!confirm('Spieler wirklich löschen?')) return;
+  S.players = S.players.filter(p => p.id !== id);
+  save();
+  renderPlayers();
+}
+
+// ─── Matches ──────────────────────────────────────────────
+function addMatch() {
+  const date     = getVal('m-date');
+  const opponent = getVal('m-opponent');
+  const isHome   = getVal('m-venue') === 'home';
+  const result   = getVal('m-result');
+  const score    = getVal('m-score');
+  if (!date || !opponent) { alert('Bitte Datum und Gegner eingeben.'); return; }
+
+  S.matches.push({ id: uid(), date, opponent, isHome, result, score, participants: [] });
+  save();
+  renderMatches();
+  setVal('m-date',''); setVal('m-opponent',''); setVal('m-score','');
+  toast('Spieltag erstellt ✓');
+}
+
+function deleteMatch(id) {
+  if (!confirm('Spieltag wirklich löschen?')) return;
+  S.matches = S.matches.filter(m => m.id !== id);
+  save();
+  renderMatches();
+}
+
+const RESULT_BADGE = {
+  win:  '<span class="badge badge-win">Sieg</span>',
+  draw: '<span class="badge badge-draw">Unentschieden</span>',
+  loss: '<span class="badge badge-loss">Niederlage</span>'
+};
+
+function renderMatches() {
+  const el = document.getElementById('matches-list');
+  if (!S.matches.length) {
+    el.innerHTML = '<div class="card empty">Noch keine Spieltage angelegt.</div>';
+    return;
+  }
+  const sorted = [...S.matches].sort((a, b) => b.date.localeCompare(a.date));
+  const total = S.players.filter(p => p.active !== false).length;
+
+  el.innerHTML = sorted.map(m => {
+    const parCount = m.participants.length;
+    const venue = m.isHome ? '🏠 Heim' : '✈️ Auswärts';
+    const scoreStr = m.score ? ` <span class="text-muted">(${esc(m.score)})</span>` : '';
+    const fupaBadge = m.fupaId ? '<span style="font-size:.75rem;color:var(--gray-500);margin-left:.5rem;">🔄 FuPa</span>' : '';
+    return `
+      <div class="card">
+        <div class="flex justify-between items-center" style="flex-wrap:wrap; gap:.5rem;">
+          <div>
+            <span class="font-bold">${fmtDate(m.date)}</span>
+            <span class="text-muted" style="margin:0 .375rem;">vs.</span>
+            <span class="font-bold">${esc(m.opponent)}</span>${scoreStr}
+            <span class="text-muted" style="margin-left:.5rem; font-size:.8125rem;">${venue}</span>
+            ${fupaBadge}
+          </div>
+          <div>${RESULT_BADGE[m.result] || ''}</div>
+        </div>
+        <div class="flex gap-2 items-center" style="margin-top:.875rem; flex-wrap:wrap;">
+          <button class="btn btn-secondary btn-sm" onclick="openLineup('${m.id}')">
+            👥 Aufstellung (${parCount}/${total})
+          </button>
+          <button class="btn btn-danger btn-sm" onclick="deleteMatch('${m.id}')">Löschen</button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+// ─── Lineup Modal ─────────────────────────────────────────
+const STATUS_OPTS = [
+  { v: 'absent',     l: 'Nicht dabei' },
+  { v: 'starter',    l: '🟢 Starter / früh ausgewechselt' },
+  { v: 'sub_early',  l: '🟡 Einwechslung vor Min. 46 (volle Prämie)' },
+  { v: 'sub_late',   l: '🔴 Einwechslung ab Min. 46 (halbe Prämie)' },
+  { v: 'bench',      l: '🪑 Bank – nicht eingewechselt' }
+];
+
+function openLineup(matchId) {
+  const m = S.matches.find(x => x.id === matchId);
+  if (!m) return;
+
+  document.getElementById('lineup-match-id').value = matchId;
+  document.getElementById('lineup-info').textContent =
+    `${fmtDate(m.date)} – ${m.opponent}  |  ${m.result === 'win' ? 'Sieg' : m.result === 'draw' ? 'Unentschieden' : 'Niederlage'}${m.score ? ' (' + m.score + ')' : ''}`;
+
+  const players = S.players.filter(p => p.active !== false);
+  document.getElementById('lineup-players').innerHTML = players.map(p => {
+    const part = m.participants.find(x => x.playerId === p.id);
+    const status = part?.status || 'absent';
+    const min = part?.minuteIn || '';
+    const opts = STATUS_OPTS.map(o =>
+      `<option value="${o.v}" ${status === o.v ? 'selected' : ''}>${o.l}</option>`
+    ).join('');
+    return `
+      <div class="lineup-row">
+        <div class="lineup-name">${esc(p.name)}</div>
+        <select data-pid="${p.id}" class="lup-status">${opts}</select>
+        <input type="number" data-pid="${p.id}" class="lup-min lineup-minute"
+               value="${min}" min="1" max="120" placeholder="Min.">
+      </div>`;
+  }).join('');
+
+  document.getElementById('modal-lineup').style.display = 'flex';
+}
+
+function saveLineup() {
+  const matchId = getVal('lineup-match-id');
+  const m = S.matches.find(x => x.id === matchId);
+  if (!m) return;
+
+  const participants = [];
+  document.querySelectorAll('.lup-status').forEach(sel => {
+    const pid = sel.dataset.pid;
+    const status = sel.value;
+    const minEl = document.querySelector(`.lup-min[data-pid="${pid}"]`);
+    const minuteIn = minEl ? (parseInt(minEl.value) || null) : null;
+    if (status !== 'absent') participants.push({ playerId: pid, status, minuteIn });
+  });
+
+  m.participants = participants;
+  save();
+  closeModal('modal-lineup');
+  renderMatches();
+  toast('Aufstellung gespeichert ✓');
+}
+
+// ─── Bonus Calculation ────────────────────────────────────
+function calcBonus(player, participant, match, cfg) {
+  if (!participant || participant.status === 'absent') return 0;
+  if (participant.status === 'bench') return cfg.benchBonus;
+
+  const pointBonus = match.result === 'win'  ? cfg.winBonus  :
+                     match.result === 'draw' ? cfg.drawBonus : 0;
+  const total = pointBonus + (player.einsatzpraemie || 0);
+  return participant.status === 'sub_late' ? total * 0.5 : total;
+}
+
+// ─── Payroll ──────────────────────────────────────────────
+function initPayroll() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const last = new Date(y, now.getMonth() + 1, 0).getDate();
+  if (!getVal('pay-from')) setVal('pay-from', `${y}-${m}-01`);
+  if (!getVal('pay-to'))   setVal('pay-to',   `${y}-${m}-${String(last).padStart(2,'0')}`);
+  document.getElementById('payroll-results').innerHTML = '';
+}
+
+function calculatePayroll() {
+  const from = getVal('pay-from');
+  const to   = getVal('pay-to');
+  if (!from || !to) { alert('Bitte Zeitraum auswählen.'); return; }
+  if (from > to) { alert('Startdatum muss vor Enddatum liegen.'); return; }
+
+  const cfg = S.config;
+  const matchesInRange = S.matches.filter(m => m.date >= from && m.date <= to);
+
+  if (!matchesInRange.length) {
+    document.getElementById('payroll-results').innerHTML =
+      '<div class="card empty">Keine Spieltage im gewählten Zeitraum.</div>';
+    return;
+  }
+
+  const players = S.players.filter(p => p.active !== false);
+
+  const summaries = players.map(player => {
+    let total = 0;
+    let einsaetze = 0;
+    matchesInRange.forEach(match => {
+      const part = match.participants.find(x => x.playerId === player.id);
+      const bonus = calcBonus(player, part, match, cfg);
+      total += bonus;
+      if (part && part.status !== 'absent') einsaetze++;
+    });
+    return { player, total, einsaetze };
+  }).filter(s => s.einsaetze > 0);
+
+  summaries.sort((a, b) => b.total - a.total);
+
+  const grandTotal = summaries.reduce((s, x) => s + x.total, 0);
+
+  const rows = summaries.map(s => `
+    <tr>
+      <td class="font-bold">${esc(s.player.name)}</td>
+      <td class="text-right">${s.einsaetze}</td>
+      <td class="text-right pay-amount">${fmtEur(s.total)}</td>
+      <td class="text-right">
+        <button class="btn btn-secondary btn-sm"
+                onclick="printReport('${s.player.id}','${from}','${to}')">🖨️ Drucken</button>
+      </td>
+    </tr>`).join('');
+
+  document.getElementById('payroll-results').innerHTML = `
+    <div class="card">
+      <div class="card-title">
+        Auszahlung ${fmtDate(from)} – ${fmtDate(to)}
+        &nbsp;·&nbsp; ${matchesInRange.length} Spieltag(e)
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Spieler</th>
+              <th class="text-right">Einsätze</th>
+              <th class="text-right">Gesamtbetrag</th>
+              <th style="width:110px;"></th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+          <tfoot>
+            <tr class="pay-total">
+              <td colspan="2" style="padding:.75rem; font-weight:700;">Gesamt</td>
+              <td class="text-right pay-amount" style="padding:.75rem; font-size:1.0625rem;">${fmtEur(grandTotal)}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <p class="text-muted" style="margin-top:.75rem; font-size:.8125rem;">
+        Tipp: Auf „🖨️ Drucken" klicken, um die individuelle Monatsübersicht eines Spielers zu drucken.
+      </p>
+    </div>`;
+}
+
+// ─── Print Report ─────────────────────────────────────────
+function printReport(playerId, from, to) {
+  const player = S.players.find(p => p.id === playerId);
+  if (!player) return;
+  const cfg = S.config;
+
+  const matchesInRange = [...S.matches]
+    .filter(m => m.date >= from && m.date <= to)
+    .sort((a, b) => a.date.localeCompare(b.date));
+
+  const STATUS_LABEL = {
+    starter:   'Starter',
+    sub_early: 'Einwechslung (vor 46.)',
+    sub_late:  'Einwechslung (ab 46.) – 50 %',
+    bench:     'Bank',
+    absent:    'Nicht dabei'
+  };
+
+  let totalBonus = 0;
+
+  const rows = matchesInRange.map(m => {
+    const part = m.participants.find(x => x.playerId === playerId);
+    const bonus = calcBonus(player, part, m, cfg);
+    totalBonus += bonus;
+    const statusLabel = STATUS_LABEL[part?.status || 'absent'];
+    const resultLabel = m.result === 'win' ? 'Sieg' : m.result === 'draw' ? 'Unentschieden' : 'Niederlage';
+
+    return `
+      <tr style="border-bottom:1px solid #E5E7EB;">
+        <td style="padding:.5rem .625rem;">${fmtDate(m.date)}</td>
+        <td style="padding:.5rem .625rem;">${esc(m.opponent)}${m.score ? ` (${esc(m.score)})` : ''}</td>
+        <td style="padding:.5rem .625rem;">${resultLabel}</td>
+        <td style="padding:.5rem .625rem;">${statusLabel}</td>
+        <td style="padding:.5rem .625rem; text-align:right; font-weight:600;">
+          ${bonus > 0 ? fmtEur(bonus) : '<span style="color:#9CA3AF">—</span>'}
+        </td>
+      </tr>`;
+  }).join('');
+
+  document.getElementById('print-area').innerHTML = `
+    <div style="font-family:Arial,sans-serif; max-width:720px; margin:0 auto; color:#111;">
+      <!-- Header -->
+      <div style="display:flex; align-items:flex-end; border-bottom:3px solid #C8102E; padding-bottom:1rem; margin-bottom:1.5rem;">
+        <div>
+          <div style="font-size:1.75rem; font-weight:800; color:#C8102E; line-height:1;">FC ROT</div>
+          <div style="font-size:.875rem; color:#6B7280; margin-top:.25rem;">Prämienabrechnung · Saison ${esc(cfg.season)}</div>
+        </div>
+        <div style="margin-left:auto; text-align:right;">
+          <div style="font-size:.75rem; color:#6B7280;">Zeitraum</div>
+          <div style="font-weight:700;">${fmtDate(from)} – ${fmtDate(to)}</div>
+          <div style="font-size:.75rem; color:#6B7280; margin-top:.25rem;">Erstellt ${new Date().toLocaleDateString('de-DE')}</div>
+        </div>
+      </div>
+
+      <!-- Player info -->
+      <div style="margin-bottom:1.5rem;">
+        <div style="font-size:.75rem; text-transform:uppercase; color:#6B7280; letter-spacing:.05em;">Spieler</div>
+        <div style="font-size:1.375rem; font-weight:700; margin:.25rem 0 .25rem;">${esc(player.name)}</div>
+        <div style="font-size:.875rem; color:#6B7280;">
+          Individuelle Einsatzprämie: ${fmtEur(player.einsatzpraemie)}
+        </div>
+      </div>
+
+      <!-- Match table -->
+      <table style="width:100%; border-collapse:collapse; font-size:.875rem; margin-bottom:1.5rem;">
+        <thead>
+          <tr style="background:#F3F4F6;">
+            <th style="text-align:left; padding:.5rem .625rem; border-bottom:2px solid #E5E7EB; font-weight:700;">Datum</th>
+            <th style="text-align:left; padding:.5rem .625rem; border-bottom:2px solid #E5E7EB; font-weight:700;">Spiel</th>
+            <th style="text-align:left; padding:.5rem .625rem; border-bottom:2px solid #E5E7EB; font-weight:700;">Ergebnis</th>
+            <th style="text-align:left; padding:.5rem .625rem; border-bottom:2px solid #E5E7EB; font-weight:700;">Status</th>
+            <th style="text-align:right; padding:.5rem .625rem; border-bottom:2px solid #E5E7EB; font-weight:700;">Prämie</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+        <tfoot>
+          <tr style="background:#FFF0F2; border-top:2px solid #C8102E;">
+            <td colspan="4" style="padding:.75rem .625rem; font-weight:700; font-size:1rem;">Gesamt auszuzahlen</td>
+            <td style="text-align:right; padding:.75rem .625rem; font-weight:800; font-size:1.125rem; color:#C8102E;">${fmtEur(totalBonus)}</td>
+          </tr>
+        </tfoot>
+      </table>
+
+      <!-- Prämienstruktur -->
+      <div style="font-size:.8125rem; color:#6B7280; border:1px solid #E5E7EB; border-radius:.375rem; padding:.875rem; margin-bottom:1.5rem;">
+        <strong>Prämienstruktur Saison ${esc(cfg.season)}:</strong><br>
+        Sieg: ${fmtEur(cfg.winBonus)} · Unentschieden: ${fmtEur(cfg.drawBonus)} · Bank: ${fmtEur(cfg.benchBonus)}<br>
+        Einwechslung ab Minute 46: 50 % der Punkt- und Einsatzprämie
+      </div>
+
+      <!-- Signatures -->
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:3rem; margin-top:2rem;">
+        <div>
+          <div style="border-top:1px solid #9CA3AF; padding-top:.5rem; font-size:.8125rem; color:#6B7280;">
+            Datum &amp; Unterschrift Vorstand
+          </div>
+        </div>
+        <div>
+          <div style="border-top:1px solid #9CA3AF; padding-top:.5rem; font-size:.8125rem; color:#6B7280;">
+            Datum &amp; Unterschrift Spieler
+          </div>
+        </div>
+      </div>
+    </div>`;
+
+  window.print();
+}
+
+// ─── FuPa Import ──────────────────────────────────────────
+async function loadFupaFromRepo() {
+  try {
+    const res = await fetch('data/fupa.json?t=' + Date.now());
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+    processFupaImport(data);
+  } catch (err) {
+    alert('Konnte data/fupa.json nicht laden: ' + err.message +
+          '\n\nTipp: Diese Funktion klappt nur, wenn die App auf GitHub Pages läuft ' +
+          'und der Workflow die Datei bereits erzeugt hat. Lokal bitte manuell importieren.');
+  }
+}
+
+function importFupaFile(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      processFupaImport(JSON.parse(e.target.result));
+    } catch (err) {
+      alert('Fehler beim Lesen der Datei: ' + err.message);
+    }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function processFupaImport(data) {
+  if (!data.matches || !Array.isArray(data.matches)) {
+    alert('Ungültiges Format. Erwartet: { matches: [...] }');
+    return;
+  }
+
+  let added = 0, updated = 0;
+  const unmatched = new Set();
+
+  data.matches.forEach(fm => {
+    // Match by fupaId or date+opponent
+    let existing = S.matches.find(m => m.fupaId && m.fupaId === fm.id);
+    if (!existing) existing = S.matches.find(m => m.date === fm.date && m.opponent === fm.opponent);
+
+    const participants = [];
+    (fm.lineup || []).forEach(fp => {
+      const fullName = `${fp.firstName} ${fp.lastName}`.trim();
+      let appPlayer = fp.slug ? S.players.find(p => p.fupaSlug === fp.slug) : null;
+      if (!appPlayer) appPlayer = S.players.find(p => p.name.toLowerCase() === fullName.toLowerCase());
+      if (!appPlayer) { unmatched.add(fullName); return; }
+
+      // Determine status from FuPa data
+      // minutes < 45 means player entered at minute 46+ (90 - minutesPlayed = subMinute ≥ 46)
+      let status;
+      if (fp.starting) {
+        status = 'starter';
+      } else if ((fp.minutesPlayed || 0) >= 45) {
+        status = 'sub_early';
+      } else if ((fp.minutesPlayed || 0) > 0) {
+        status = 'sub_late';
+      } else {
+        status = 'bench';
+      }
+
+      const subMin = fp.starting ? null : (fp.minutesPlayed ? (90 - fp.minutesPlayed) : null);
+      participants.push({ playerId: appPlayer.id, status, minuteIn: subMin });
+    });
+
+    if (existing) {
+      existing.participants = participants;
+      existing.result = fm.result || existing.result;
+      existing.score  = fm.score  || existing.score;
+      updated++;
+    } else {
+      S.matches.push({
+        id: uid(), fupaId: fm.id, date: fm.date,
+        opponent: fm.opponent, isHome: fm.isHome,
+        result: fm.result || 'loss', score: fm.score || '', participants
+      });
+      added++;
+    }
+  });
+
+  S.config.fupaLastSync = new Date().toISOString();
+  save();
+  renderMatches();
+  loadSettingsUI();
+
+  let msg = `Import abgeschlossen:\n✅ ${added} neue Spieltage\n🔄 ${updated} aktualisiert`;
+  if (unmatched.size) {
+    msg += `\n\n⚠️ Folgende FuPa-Spieler konnten nicht zugeordnet werden:\n${[...unmatched].join(', ')}\n\nBitte lege diese Spieler an oder trage ihren FuPa-Slug ein.`;
+  }
+  alert(msg);
+}
+
+// ─── Data Export / Import / Reset ─────────────────────────
+function exportData() {
+  const blob = new Blob([JSON.stringify(S, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fcrot_praemien_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+function importAppData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (!imported.config || !imported.players || !imported.matches) {
+        alert('Ungültiges Backup-Format.'); return;
+      }
+      if (!confirm(`${imported.players.length} Spieler und ${imported.matches.length} Spieltage importieren? Aktuelle Daten werden überschrieben.`)) return;
+      S = imported;
+      save();
+      loadSettingsUI();
+      toast('Daten importiert ✓');
+    } catch (err) { alert('Fehler: ' + err.message); }
+  };
+  reader.readAsText(file);
+  event.target.value = '';
+}
+
+function resetData() {
+  if (!confirm('⚠️ Alle Daten wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.')) return;
+  if (!confirm('Bitte bestätigen: Alle Spieler und Spieltage werden gelöscht.')) return;
+  localStorage.removeItem(STORE_KEY);
+  location.reload();
+}
+
+// ─── Modal helpers ────────────────────────────────────────
+function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+function overlayClose(e, el) { if (e.target === el) el.style.display = 'none'; }
+
+// ─── Toast ────────────────────────────────────────────────
+let _toastTimer;
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.style.opacity = '0'; }, 2800);
+}
+
+// ─── Init ─────────────────────────────────────────────────
+load();
+loadSettingsUI();
+</script>
+</body>
+</html>

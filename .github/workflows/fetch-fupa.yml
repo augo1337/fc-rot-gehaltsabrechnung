@@ -1,0 +1,53 @@
+name: FuPa-Daten abrufen
+
+# Holt die aktuellen Spieltags- und Aufstellungsdaten von FuPa
+# und committet sie als data/fupa.json ins Repo.
+#
+# Auslösung:
+#   - Manuell über den "Run workflow"-Button (Actions-Tab)
+#   - Automatisch: jeden Montag 06:00 UTC (nach dem Wochenende)
+
+on:
+  workflow_dispatch:
+    inputs:
+      team_slug:
+        description: 'FuPa Team-Slug (z.B. fc-rot-m1-2026-27)'
+        required: true
+        default: 'fc-rot-m1-2026-27'
+  schedule:
+    # Montags 06:00 UTC (= 07:00/08:00 DE) – nach dem Spielwochenende
+    - cron: '0 6 * * 1'
+
+# Dem Workflow erlauben, ins Repo zu committen
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repository auschecken
+        uses: actions/checkout@v4
+
+      - name: Node einrichten
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: FuPa-Daten abrufen
+        env:
+          # Bei schedule: Default-Slug; bei manuell: Eingabe
+          TEAM_SLUG: ${{ github.event.inputs.team_slug || 'fc-rot-m1-2026-27' }}
+        run: node scripts/fetch-fupa.js "$TEAM_SLUG"
+
+      - name: Änderungen committen
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fupa.json
+          if git diff --staged --quiet; then
+            echo "Keine Änderungen – nichts zu committen."
+          else
+            git commit -m "chore: FuPa-Daten aktualisiert ($(date +%Y-%m-%d))"
+            git push
+          fi
