@@ -426,6 +426,42 @@
 // ─── State ────────────────────────────────────────────────
 const STORE_KEY = 'fcrot_praemien_v1';
 
+// Trainer / Spielertrainer – NIE in der Spielerliste anzeigen, auch wenn sie
+// als Spielertrainer gespielt haben. Blockiert über FuPa-Slug und Name.
+// Bis zur Script-Anpassung bleiben alle Trainer hier ausgeschlossen.
+const COACH_BLOCKLIST_SLUGS = new Set([
+  'dustin-hauk-99334',
+  'david-engelmann-57395',
+  'marvin-jaeger-62077',
+  'andre-braun-56339'
+]);
+const COACH_BLOCKLIST_NAMES = new Set([
+  'dustin hauk',
+  'david engelmann',
+  'marvin jäger',
+  'andré braun'
+]);
+
+function isBlockedCoach(p) {
+  if (p.fupaSlug && COACH_BLOCKLIST_SLUGS.has(p.fupaSlug)) return true;
+  if (p.slug && COACH_BLOCKLIST_SLUGS.has(p.slug)) return true;
+  const name = `${p.name || ((p.firstName || '') + ' ' + (p.lastName || '')).trim()}`.toLowerCase().trim();
+  return COACH_BLOCKLIST_NAMES.has(name);
+}
+
+// Entfernt geblockte Trainer aus dem State. Gibt Anzahl entfernter zurück.
+function pruneBlockedCoaches() {
+  const before = S.players.length;
+  const removedIds = new Set(S.players.filter(isBlockedCoach).map(p => p.id));
+  if (!removedIds.size) return 0;
+  S.players = S.players.filter(p => !removedIds.has(p.id));
+  // auch aus Aufstellungen entfernen
+  S.matches.forEach(m => {
+    m.participants = (m.participants || []).filter(pt => !removedIds.has(pt.playerId));
+  });
+  return before - S.players.length;
+}
+
 let S = {
   config: {
     season:    '2026-27',
@@ -437,7 +473,7 @@ let S = {
     fupaLastSync: null
   },
   players: [],
-  // { id, name, einsatzpraemie, fupaSlug, active }
+  // { id, name, einsatzpraemie, fupaSlug, position, active }
   matches: []
   // { id, fupaId?, date, opponent, isHome, result, score, participants: [{playerId, status, minuteIn}] }
 };
@@ -447,6 +483,8 @@ function load() {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw) S = JSON.parse(raw);
   } catch (_) {}
+  // Alt-Daten bereinigen: evtl. früher importierte Trainer entfernen
+  if (pruneBlockedCoaches()) save();
 }
 
 function save() {
@@ -773,7 +811,7 @@ function calculatePayroll() {
     return { player, total, einsaetze };
   }).filter(s => s.einsaetze > 0);
 
-  summaries.sort((a, b) => b.total - a.total);
+  summaries.sort((a, b) => sortByPositionThenName(a.player, b.player));
 
   const grandTotal = summaries.reduce((s, x) => s + x.total, 0);
 
@@ -862,7 +900,8 @@ function printReport(playerId, from, to) {
   document.getElementById('print-area').innerHTML = `
     <div style="font-family:Arial,sans-serif; max-width:720px; margin:0 auto; color:#111;">
       <!-- Header -->
-      <div style="display:flex; align-items:flex-end; border-bottom:3px solid #15803D; padding-bottom:1rem; margin-bottom:1.5rem;">
+      <div style="display:flex; align-items:center; gap:1rem; border-bottom:3px solid #15803D; padding-bottom:1rem; margin-bottom:1.5rem;">
+        <img src="logo.jpeg" alt="FC ROT" style="width:64px; height:64px; border-radius:50%; object-fit:cover; flex-shrink:0;">
         <div>
           <div style="font-size:1.75rem; font-weight:800; color:#15803D; line-height:1;">FC ROT</div>
           <div style="font-size:.875rem; color:#6B7280; margin-top:.25rem;">Prämienabrechnung · Saison ${esc(cfg.season)}</div>
@@ -957,8 +996,9 @@ function importFupaFile(event) {
   event.target.value = '';
 }
 
-// Spieler finden oder (aus Aufstellung) neu anlegen. Gibt {player, created} zurück.
+// Spieler finden oder (aus Aufstellung) neu anlegen. Gibt {player, created} oder null (Trainer).
 function resolvePlayerFromFupa(fp) {
+  if (isBlockedCoach(fp)) return null;   // Trainer nie anlegen
   const fullName = `${fp.firstName} ${fp.lastName}`.trim();
   let p = fp.slug ? S.players.find(x => x.fupaSlug === fp.slug) : null;
   if (!p) p = S.players.find(x => x.name.toLowerCase() === fullName.toLowerCase());
@@ -993,6 +1033,7 @@ function processFupaImport(data) {
   let playersAdded = 0;
   (data.players || []).forEach(fp => {
     if (!fp.slug) return;
+    if (isBlockedCoach(fp)) return;   // Trainer überspringen
     const fullName = `${fp.firstName} ${fp.lastName}`.trim();
     let existing = S.players.find(p => p.fupaSlug === fp.slug);
     // Fallback: über Namen zuordnen und Slug nachtragen
@@ -1021,10 +1062,11 @@ function processFupaImport(data) {
 
     const participants = [];
     (fm.lineup || []).forEach(fp => {
-      const { player, created } = resolvePlayerFromFupa(fp);
-      if (created) playersAdded++;
+      const r = resolvePlayerFromFupa(fp);
+      if (!r) return;   // Trainer – nicht aufnehmen
+      if (r.created) playersAdded++;
       const { status, minuteIn } = fupaStatus(fp);
-      participants.push({ playerId: player.id, status, minuteIn });
+      participants.push({ playerId: r.player.id, status, minuteIn });
     });
 
     if (existing) {
@@ -1095,7 +1137,7 @@ function applyNewSeason(data) {
   S.players.forEach(p => { if (p.fupaSlug) oldBySlug[p.fupaSlug] = p.einsatzpraemie || 0; });
 
   let carried = 0, fresh = 0;
-  const newPlayers = data.players.filter(fp => fp.slug).map(fp => {
+  const newPlayers = data.players.filter(fp => fp.slug && !isBlockedCoach(fp)).map(fp => {
     const known = oldBySlug[fp.slug] != null;
     if (known) carried++; else fresh++;
     return {
