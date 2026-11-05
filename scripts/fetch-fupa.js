@@ -71,15 +71,44 @@ async function main() {
   const ourTeamId = team.teamId || team.id;
   console.log(`  Team: ${team.name?.full || team.name} (teamId ${ourTeamId})`);
 
-  // 2) Gespielte Spiele der Saison
+  // 2) Kader abrufen
+  const squad = await getJSON(`${API}/teams/${TEAM_SLUG}/squad`);
+  const squadPlayers = (squad.players || [])
+    .filter(p => !p.isDeactivated)
+    .map(p => ({
+      slug:      p.slug || '',
+      firstName: p.firstName || '',
+      lastName:  p.lastName || '',
+      position:  p.position || '',
+      number:    p.jerseyNumber ?? null
+    }));
+  console.log(`  Kader: ${squadPlayers.length} aktive Spieler`);
+
+  // 3) Gespielte Spiele der Saison
   const pastMatches = await getJSON(`${API}/teams/${TEAM_SLUG}/matches?flavor=past`);
   const matchList = Array.isArray(pastMatches) ? pastMatches : [];
-  console.log(`  Gespielte Spiele: ${matchList.length}`);
+  console.log(`  Gespielte Spiele gesamt: ${matchList.length}`);
 
-  const out = { team: TEAM_SLUG, generatedAt: new Date().toISOString(), matches: [] };
+  const out = {
+    team: TEAM_SLUG,
+    generatedAt: new Date().toISOString(),
+    players: squadPlayers,
+    matches: []
+  };
 
-  // 3) Für jedes Spiel die Aufstellung laden
+  let skippedNonLeague = 0;
+
+  // 4) Für jedes Spiel die Aufstellung laden
   for (const m of matchList) {
+    // NUR LIGASPIELE – Pokal (cup) und Freundschaftsspiele (testmatch)
+    // geben keine Prämie. Auf m.category filtern, NICHT auf round.type
+    // (Testspiele haben round.type 'league', aber category 'testmatch').
+    if (m.category !== 'league') {
+      skippedNonLeague++;
+      console.log(`  ⤵ übersprungen (${m.category}): ${m.slug}`);
+      continue;
+    }
+
     // Nur abgeschlossene Spiele (section POST) berücksichtigen
     if (m.section && m.section !== 'POST') {
       console.log(`  ⤵ übersprungen (nicht beendet): ${m.slug}`);
@@ -139,7 +168,8 @@ async function main() {
 
   fs.mkdirSync(path.dirname(OUT_FILE), { recursive: true });
   fs.writeFileSync(OUT_FILE, JSON.stringify(out, null, 2), 'utf8');
-  console.log(`✅ Geschrieben: ${OUT_FILE} (${out.matches.length} Spiele)`);
+  console.log(`✅ Geschrieben: ${OUT_FILE}`);
+  console.log(`   ${out.players.length} Spieler · ${out.matches.length} Ligaspiele · ${skippedNonLeague} Nicht-Liga-Spiele ignoriert`);
 }
 
 main().catch(err => {

@@ -252,25 +252,32 @@
   <!-- ── TAB: SPIELER ── -->
   <div id="tab-players" style="display:none;">
     <div class="card">
-      <div class="flex justify-between items-center mb-0" style="margin-bottom:0;">
-        <div class="card-title" style="margin-bottom:0;">Kader verwalten</div>
-        <button class="btn btn-primary btn-sm" onclick="openPlayerModal()">+ Spieler hinzufügen</button>
+      <div class="flex justify-between items-center" style="flex-wrap:wrap; gap:.5rem;">
+        <div class="card-title" style="margin-bottom:0;">Kader &amp; Einsatzprämien</div>
+        <div class="flex gap-2">
+          <button class="btn btn-primary btn-sm" onclick="loadFupaFromRepo()">🔄 Kader aus FuPa laden</button>
+          <button class="btn btn-secondary btn-sm" onclick="openPlayerModal()">+ Manuell</button>
+        </div>
       </div>
+      <p class="text-muted" style="margin:.75rem 0 0; font-size:.8125rem; line-height:1.5;">
+        Trage je Spieler die individuelle <strong>Einsatzprämie</strong> ein – sie wird
+        sofort gespeichert und bleibt bei jedem FuPa-Sync erhalten. Neue Spieler aus dem
+        Kader erscheinen automatisch mit 0 €.
+      </p>
       <div class="table-wrap" style="margin-top:1rem;">
         <table>
           <thead>
             <tr>
               <th>Name</th>
-              <th class="text-right">Einsatzprämie</th>
-              <th>FuPa-Slug</th>
-              <th>Status</th>
-              <th style="width:130px;"></th>
+              <th>Position</th>
+              <th style="width:170px;">Einsatzprämie (€)</th>
+              <th style="width:90px;"></th>
             </tr>
           </thead>
           <tbody id="players-tbody"></tbody>
         </table>
         <div id="players-empty" class="empty" style="display:none;">
-          Noch keine Spieler angelegt. Klicke auf "+ Spieler hinzufügen".
+          Noch keine Spieler. Klicke auf „🔄 Kader aus FuPa laden" oder „+ Manuell".
         </div>
       </div>
     </div>
@@ -497,7 +504,8 @@ function setVal(id, v) { document.getElementById(id).value = v ?? ''; }
 
 // ─── Players ──────────────────────────────────────────────
 function renderPlayers() {
-  const list = S.players.filter(p => p.active !== false);
+  const list = S.players.filter(p => p.active !== false)
+    .sort((a, b) => a.name.localeCompare(b.name, 'de'));
   const tbody = document.getElementById('players-tbody');
   const empty = document.getElementById('players-empty');
   empty.style.display = list.length ? 'none' : '';
@@ -505,15 +513,27 @@ function renderPlayers() {
   tbody.innerHTML = list.map(p => `
     <tr>
       <td class="font-bold">${esc(p.name)}</td>
-      <td class="text-right">${fmtEur(p.einsatzpraemie)}</td>
-      <td class="text-muted" style="font-size:.8125rem;">${esc(p.fupaSlug || '—')}</td>
-      <td><span class="badge badge-active">Aktiv</span></td>
+      <td class="text-muted" style="font-size:.8125rem;">${esc(p.position || '—')}</td>
+      <td>
+        <input type="number" min="0" step="0.50" value="${p.einsatzpraemie ?? 0}"
+               class="praemie-input" data-pid="${p.id}"
+               style="width:140px; padding:.35rem .5rem;"
+               onchange="updatePraemie('${p.id}', this.value)">
+      </td>
       <td class="text-right">
-        <button class="btn btn-secondary btn-sm" onclick="openPlayerModal('${p.id}')">Bearbeiten</button>
-        <button class="btn btn-danger btn-sm" style="margin-left:.25rem;" onclick="deletePlayer('${p.id}')">Löschen</button>
+        <button class="btn btn-secondary btn-sm" onclick="openPlayerModal('${p.id}')" title="Name/Slug bearbeiten">✏️</button>
+        <button class="btn btn-danger btn-sm" style="margin-left:.25rem;" onclick="deletePlayer('${p.id}')" title="Löschen">🗑</button>
       </td>
     </tr>
   `).join('');
+}
+
+function updatePraemie(id, value) {
+  const p = S.players.find(x => x.id === id);
+  if (!p) return;
+  p.einsatzpraemie = parseFloat(value) || 0;
+  save();
+  toast(`Einsatzprämie für ${p.name}: ${fmtEur(p.einsatzpraemie)} ✓`);
 }
 
 function openPlayerModal(id) {
@@ -912,27 +932,63 @@ function importFupaFile(event) {
 
 function processFupaImport(data) {
   if (!data.matches || !Array.isArray(data.matches)) {
-    alert('Ungültiges Format. Erwartet: { matches: [...] }');
+    alert('Ungültiges Format. Erwartet: { players: [...], matches: [...] }');
     return;
   }
 
+  // ── 1) Kader importieren: Match über Slug, Einsatzprämie IMMER erhalten ──
+  let playersAdded = 0;
+  (data.players || []).forEach(fp => {
+    if (!fp.slug) return;
+    const fullName = `${fp.firstName} ${fp.lastName}`.trim();
+    let existing = S.players.find(p => p.fupaSlug === fp.slug);
+    // Fallback: über Namen zuordnen und Slug nachtragen
+    if (!existing) existing = S.players.find(p => !p.fupaSlug && p.name.toLowerCase() === fullName.toLowerCase());
+
+    if (existing) {
+      existing.fupaSlug = fp.slug;          // Slug sicherstellen
+      existing.name     = fullName || existing.name;
+      existing.position = fp.position || existing.position;
+      // einsatzpraemie bleibt unangetastet!
+    } else {
+      S.players.push({
+        id: uid(), name: fullName, einsatzpraemie: 0,
+        fupaSlug: fp.slug, position: fp.position || '', active: true
+      });
+      playersAdded++;
+    }
+  });
+
+  // Hilfsfunktion: Spieler finden oder (aus Aufstellung) neu anlegen
+  function resolvePlayer(fp) {
+    const fullName = `${fp.firstName} ${fp.lastName}`.trim();
+    let p = fp.slug ? S.players.find(x => x.fupaSlug === fp.slug) : null;
+    if (!p) p = S.players.find(x => x.name.toLowerCase() === fullName.toLowerCase());
+    if (!p) {
+      // Spieler aus Aufstellung, der (noch) nicht im Kader steht → anlegen
+      p = { id: uid(), name: fullName, einsatzpraemie: 0,
+            fupaSlug: fp.slug || '', position: fp.position || '', active: true };
+      S.players.push(p);
+      playersAdded++;
+    }
+    return p;
+  }
+
+  // ── 2) Spieltage importieren (nur Ligaspiele kommen aus fupa.json) ──
   let added = 0, updated = 0;
-  const unmatched = new Set();
 
   data.matches.forEach(fm => {
-    // Match by fupaId or date+opponent
     let existing = S.matches.find(m => m.fupaId && m.fupaId === fm.id);
     if (!existing) existing = S.matches.find(m => m.date === fm.date && m.opponent === fm.opponent);
 
     const participants = [];
     (fm.lineup || []).forEach(fp => {
-      const fullName = `${fp.firstName} ${fp.lastName}`.trim();
-      let appPlayer = fp.slug ? S.players.find(p => p.fupaSlug === fp.slug) : null;
-      if (!appPlayer) appPlayer = S.players.find(p => p.name.toLowerCase() === fullName.toLowerCase());
-      if (!appPlayer) { unmatched.add(fullName); return; }
+      const appPlayer = resolvePlayer(fp);
 
-      // Determine status from FuPa data
-      // minutes < 45 means player entered at minute 46+ (90 - minutesPlayed = subMinute ≥ 46)
+      // Status aus FuPa-Daten ableiten.
+      // minutesPlayed >= 45 → Einwechslung vor Min. 46 (volle Prämie)
+      // 0 < minutesPlayed < 45 → Einwechslung ab Min. 46 (halbe Prämie)
+      // minutesPlayed === 0 (nicht-Starter) → Bank, nicht eingewechselt
       let status;
       if (fp.starting) {
         status = 'starter';
@@ -952,6 +1008,7 @@ function processFupaImport(data) {
       existing.participants = participants;
       existing.result = fm.result || existing.result;
       existing.score  = fm.score  || existing.score;
+      existing.fupaId = fm.id;
       updated++;
     } else {
       S.matches.push({
@@ -966,13 +1023,16 @@ function processFupaImport(data) {
   S.config.fupaLastSync = new Date().toISOString();
   save();
   renderMatches();
+  renderPlayers();
   loadSettingsUI();
 
-  let msg = `Import abgeschlossen:\n✅ ${added} neue Spieltage\n🔄 ${updated} aktualisiert`;
-  if (unmatched.size) {
-    msg += `\n\n⚠️ Folgende FuPa-Spieler konnten nicht zugeordnet werden:\n${[...unmatched].join(', ')}\n\nBitte lege diese Spieler an oder trage ihren FuPa-Slug ein.`;
-  }
-  alert(msg);
+  alert(
+    `Import abgeschlossen:\n` +
+    `👥 ${playersAdded} neue Spieler (bestehende Prämien erhalten)\n` +
+    `✅ ${added} neue Ligaspiele\n` +
+    `🔄 ${updated} aktualisiert\n\n` +
+    `Nur Ligaspiele werden importiert – Pokal & Freundschaftsspiele bleiben außen vor.`
+  );
 }
 
 // ─── Data Export / Import / Reset ─────────────────────────
