@@ -1,14 +1,7 @@
 {
   "team": "fc-rot-m1-2026-27",
-  "generatedAt": "2026-11-05T16:22:28.873Z",
+  "generatedAt": "2026-11-05T17:04:42.913Z",
   "players": [
-    {
-      "slug": "andre-braun-56339",
-      "firstName": "André",
-      "lastName": "Braun",
-      "position": "Torwart",
-      "number": null
-    },
     {
       "slug": "hakan-derin-379978",
       "firstName": "Hakan",
@@ -85,20 +78,6 @@
       "lastName": "Berzel",
       "position": "Mittelfeld",
       "number": 3
-    },
-    {
-      "slug": "david-engelmann-57395",
-      "firstName": "David",
-      "lastName": "Engelmann",
-      "position": "Mittelfeld",
-      "number": 10
-    },
-    {
-      "slug": "marvin-jaeger-62077",
-      "firstName": "Marvin",
-      "lastName": "Jäger",
-      "position": "Mittelfeld",
-      "number": null
     },
     {
       "slug": "dominik-jordan-232287",
@@ -282,17 +261,6 @@
           "redCard": 0
         },
         {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "tobias-longo-530275",
           "firstName": "Tobias",
           "lastName": "Longo",
@@ -412,39 +380,6 @@
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
-        },
-        {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
         }
       ]
     },
@@ -457,17 +392,6 @@
       "result": "win",
       "score": "1:0",
       "lineup": [
-        {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
         {
           "slug": "lukas-harmsen-373697",
           "firstName": "Lukas",
@@ -508,17 +432,6 @@
           "position": "Abwehr",
           "starting": true,
           "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 84,
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
@@ -643,28 +556,6 @@
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
         }
       ]
     },
@@ -715,17 +606,6 @@
           "firstName": "Moritz",
           "lastName": "Strompf",
           "position": "Abwehr",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
           "goals": 0,
@@ -799,17 +679,6 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 45,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "nils-bellemann-2082584",
           "firstName": "Nils",
           "lastName": "Bellemann",
@@ -847,39 +716,6 @@
           "firstName": "Manuel",
           "lastName": "Sailer",
           "position": "Angriff",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "marvin-jaeger-62077",
-          "firstName": "Marvin",
-          "lastName": "Jäger",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,
@@ -948,17 +784,6 @@
           "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
-          "goals": 1,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 68,
           "goals": 1,
           "yellowCard": 0,
           "redCard": 0
@@ -1074,17 +899,6 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "lukas-harmsen-373697",
           "firstName": "Lukas",
           "lastName": "Harmsen",
@@ -1111,28 +925,6 @@
           "firstName": "Maurice",
           "lastName": "Wensch",
           "position": "Angriff",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,
@@ -1191,17 +983,6 @@
           "starting": true,
           "minutesPlayed": 90,
           "goals": 1,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
           "yellowCard": 0,
           "redCard": 0
         },
@@ -1327,54 +1108,10 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "lukas-harmsen-373697",
           "firstName": "Lukas",
           "lastName": "Harmsen",
           "position": "Abwehr",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "marvin-jaeger-62077",
-          "firstName": "Marvin",
-          "lastName": "Jäger",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,
@@ -1443,17 +1180,6 @@
           "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 52,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 84,
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
@@ -1569,17 +1295,6 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "thomas-triller-1828106",
           "firstName": "Thomas",
           "lastName": "Triller",
@@ -1606,39 +1321,6 @@
           "firstName": "Manuel",
           "lastName": "Sailer",
           "position": "Angriff",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "marvin-jaeger-62077",
-          "firstName": "Marvin",
-          "lastName": "Jäger",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,
@@ -1696,17 +1378,6 @@
           "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 69,
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
@@ -1831,39 +1502,6 @@
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
-        },
-        {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
         }
       ]
     },
@@ -1925,17 +1563,6 @@
           "firstName": "Moritz",
           "lastName": "Strompf",
           "position": "Abwehr",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
           "goals": 0,
@@ -2053,54 +1680,10 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "manuel-sailer-56815",
           "firstName": "Manuel",
           "lastName": "Sailer",
           "position": "Angriff",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "marvin-jaeger-62077",
-          "firstName": "Marvin",
-          "lastName": "Jäger",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,
@@ -2166,17 +1749,6 @@
           "slug": "adrian-berzel-571938",
           "firstName": "Adrian",
           "lastName": "Berzel",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
           "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
@@ -2295,17 +1867,6 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "jim-reinhard-knopf-1828113",
           "firstName": "Jim Reinhard",
           "lastName": "Knopf",
@@ -2320,28 +1881,6 @@
           "slug": "kevin-mueller-388215",
           "firstName": "Kevin",
           "lastName": "Müller",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
           "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
@@ -2409,17 +1948,6 @@
           "firstName": "Moritz",
           "lastName": "Strompf",
           "position": "Abwehr",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
           "starting": true,
           "minutesPlayed": 90,
           "goals": 0,
@@ -2546,39 +2074,6 @@
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "marvin-jaeger-62077",
-          "firstName": "Marvin",
-          "lastName": "Jäger",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
         }
       ]
     },
@@ -2643,17 +2138,6 @@
           "starting": true,
           "minutesPlayed": 90,
           "goals": 1,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 90,
-          "goals": 0,
           "yellowCard": 0,
           "redCard": 0
         },
@@ -2757,17 +2241,6 @@
           "redCard": 0
         },
         {
-          "slug": "andre-braun-56339",
-          "firstName": "André",
-          "lastName": "Braun",
-          "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
           "slug": "timo-mayer-57355",
           "firstName": "Timo",
           "lastName": "Mayer",
@@ -2793,28 +2266,6 @@
           "slug": "finn-wilke-2323635",
           "firstName": "Finn",
           "lastName": "Wilke",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
           "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
@@ -2885,17 +2336,6 @@
           "starting": true,
           "minutesPlayed": 75,
           "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": true,
-          "minutesPlayed": 60,
-          "goals": 1,
           "yellowCard": 0,
           "redCard": 0
         },
@@ -3014,28 +2454,6 @@
           "firstName": "Hakan",
           "lastName": "Derin",
           "position": "Torwart",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "david-engelmann-57395",
-          "firstName": "David",
-          "lastName": "Engelmann",
-          "position": "Mittelfeld",
-          "starting": false,
-          "minutesPlayed": 0,
-          "goals": 0,
-          "yellowCard": 0,
-          "redCard": 0
-        },
-        {
-          "slug": "dustin-hauk-99334",
-          "firstName": "Dustin",
-          "lastName": "Hauk",
-          "position": "Mittelfeld",
           "starting": false,
           "minutesPlayed": 0,
           "goals": 0,

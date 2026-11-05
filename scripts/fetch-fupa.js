@@ -73,8 +73,17 @@ async function main() {
 
   // 2) Kader abrufen
   const squad = await getJSON(`${API}/teams/${TEAM_SLUG}/squad`);
+
+  // Trainer / Betreuer ausschließen – auch Spielertrainer (gleicher Slug in
+  // players UND coaches). Blocklist aus den Slugs der coaches-Liste bauen.
+  const coachSlugs = new Set((squad.coaches || []).map(c => c.slug).filter(Boolean));
+  if (coachSlugs.size) {
+    console.log(`  Trainer ausgeschlossen: ${[...coachSlugs].join(', ')}`);
+  }
+
   const squadPlayers = (squad.players || [])
     .filter(p => !p.isDeactivated)
+    .filter(p => !coachSlugs.has(p.slug))
     .map(p => ({
       slug:      p.slug || '',
       firstName: p.firstName || '',
@@ -82,7 +91,7 @@ async function main() {
       position:  p.position || '',
       number:    p.jerseyNumber ?? null
     }));
-  console.log(`  Kader: ${squadPlayers.length} aktive Spieler`);
+  console.log(`  Kader: ${squadPlayers.length} Spieler (ohne Trainer)`);
 
   // 3) Gespielte Spiele der Saison
   const pastMatches = await getJSON(`${API}/teams/${TEAM_SLUG}/matches?flavor=past`);
@@ -145,6 +154,8 @@ async function main() {
     if (!lu.__notFound) {
       const ours = weAreHome ? lu.homeTeam : lu.awayTeam;
       (ours?.lineup || []).forEach(p => {
+        // Trainer/Spielertrainer auch aus der Aufstellung ausschließen
+        if (coachSlugs.has(p.player?.slug)) return;
         entry.lineup.push({
           slug:          p.player?.slug || '',
           firstName:     p.player?.firstName || '',
