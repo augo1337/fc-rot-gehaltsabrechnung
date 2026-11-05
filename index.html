@@ -448,8 +448,8 @@
 //  (Daten nur im Browser). Mit gültigen Werten → CLOUD-Modus
 //  (zentrale Daten + gemeinsames Login, alle 3 sehen dasselbe).
 // ═══════════════════════════════════════════════════════════
-const SUPABASE_URL      = 'DEINE_SUPABASE_URL';        // z.B. https://abcd1234.supabase.co
-const SUPABASE_ANON_KEY = 'DEIN_SUPABASE_ANON_KEY';    // "anon public" Key aus Project Settings → API
+const SUPABASE_URL      = 'https://ivvcihrlefwiaybbdbcm.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_WxZjscBb_IZaYtXFwd4v5w_SgK5GaOa';
 const SHARED_LOGIN_EMAIL = 'team@fcrot.app';           // fester Login-User (Passwort = gemeinsam, in Supabase angelegt)
 
 const CLOUD = /^https:\/\//.test(SUPABASE_URL) && SUPABASE_ANON_KEY.length > 20;
@@ -458,7 +458,7 @@ if (CLOUD && window.supabase) {
   sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 }
 let _authed = false;
-let _suppressRealtime = '';   // JSON des zuletzt selbst gespeicherten Stands (Echo ignorieren)
+let _lastPushAt = 0;   // Zeitpunkt des letzten eigenen Cloud-Speicherns (Echo-Erkennung)
 
 // ─── State ────────────────────────────────────────────────
 const STORE_KEY = 'fcrot_praemien_v1';
@@ -538,8 +538,7 @@ function scheduleCloudPush() {
 
 async function pushToCloud() {
   if (!sb) return;
-  const snapshot = JSON.stringify(S);
-  _suppressRealtime = snapshot;   // eigenes Echo beim Realtime-Event ignorieren
+  _lastPushAt = Date.now();
   const { error } = await sb.from('app_state')
     .update({ data: S, updated_at: new Date().toISOString() })
     .eq('id', 1);
@@ -567,9 +566,10 @@ function subscribeRealtime() {
         payload => {
           const incoming = payload.new && payload.new.data;
           if (!incoming) return;
-          const incomingStr = JSON.stringify(incoming);
-          if (incomingStr === _suppressRealtime) return;          // eigenes Echo
-          if (incomingStr === JSON.stringify(S)) return;          // identisch
+          // Eigenes Echo ignorieren: kurz nach eigenem Speichern (jsonb kann Keys
+          // umsortieren, daher Zeitfenster statt reinem String-Vergleich).
+          if (Date.now() - _lastPushAt < 2500) return;
+          if (JSON.stringify(incoming) === JSON.stringify(S)) return;   // identisch
           S = incoming;
           pruneBlockedCoaches();
           localStorage.setItem(STORE_KEY, JSON.stringify(S));
