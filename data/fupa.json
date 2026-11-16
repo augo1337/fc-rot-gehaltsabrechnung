@@ -1,6 +1,6 @@
 {
   "team": "fc-rot-m1-2026-27",
-  "generatedAt": "2026-11-09T14:51:22.251Z",
+  "generatedAt": "2026-11-16T14:27:41.050Z",
   "players": [
     {
       "slug": "hakan-derin-379978",
@@ -207,6 +207,193 @@
     }
   ],
   "matches": [
+    {
+      "id": 15062159,
+      "slug": "fc-rot-m1-vfb-rauenberg-m1-261113",
+      "date": "2026-11-13",
+      "opponent": "VfB Rauenberg",
+      "isHome": true,
+      "result": "win",
+      "score": "2:1",
+      "lineup": [
+        {
+          "slug": "nils-zur-wieden-941541",
+          "firstName": "Nils",
+          "lastName": "zur Wieden",
+          "position": "Torwart",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "lukas-harmsen-373697",
+          "firstName": "Lukas",
+          "lastName": "Harmsen",
+          "position": "Abwehr",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "timo-mayer-57355",
+          "firstName": "Timo",
+          "lastName": "Mayer",
+          "position": "Abwehr",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "moritz-strompf-886139",
+          "firstName": "Moritz",
+          "lastName": "Strompf",
+          "position": "Abwehr",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 1,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "adrian-berzel-571938",
+          "firstName": "Adrian",
+          "lastName": "Berzel",
+          "position": "Mittelfeld",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "tobias-longo-530275",
+          "firstName": "Tobias",
+          "lastName": "Longo",
+          "position": "Mittelfeld",
+          "starting": true,
+          "minutesPlayed": 65,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "kevin-mueller-388215",
+          "firstName": "Kevin",
+          "lastName": "Müller",
+          "position": "Mittelfeld",
+          "starting": true,
+          "minutesPlayed": 90,
+          "goals": 0,
+          "yellowCard": 1,
+          "redCard": 0
+        },
+        {
+          "slug": "benjamin-sailer-298217",
+          "firstName": "Benjamin",
+          "lastName": "Sailer",
+          "position": "Mittelfeld",
+          "starting": true,
+          "minutesPlayed": 78,
+          "goals": 1,
+          "yellowCard": 1,
+          "redCard": 0
+        },
+        {
+          "slug": "jannis-schuhmacher-496868",
+          "firstName": "Jannis",
+          "lastName": "Schuhmacher",
+          "position": "Mittelfeld",
+          "starting": true,
+          "minutesPlayed": 58,
+          "goals": 0,
+          "yellowCard": 1,
+          "redCard": 0
+        },
+        {
+          "slug": "dennis-hofmann-867918",
+          "firstName": "Dennis",
+          "lastName": "Hofmann",
+          "position": "Angriff",
+          "starting": true,
+          "minutesPlayed": 73,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "ignjat-radenkovic-2050099",
+          "firstName": "Ignjat",
+          "lastName": "Radenkovic",
+          "position": "Abwehr",
+          "starting": false,
+          "minutesPlayed": 12,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "nils-bellemann-2082584",
+          "firstName": "Nils",
+          "lastName": "Bellemann",
+          "position": "Mittelfeld",
+          "starting": false,
+          "minutesPlayed": 12,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "yannis-said-464944",
+          "firstName": "Yannis",
+          "lastName": "Said",
+          "position": "Mittelfeld",
+          "starting": false,
+          "minutesPlayed": 32,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "jannis-schuhmacher-867916",
+          "firstName": "Jannis",
+          "lastName": "Schuhmacher",
+          "position": "Mittelfeld",
+          "starting": false,
+          "minutesPlayed": 25,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "manuel-sailer-56815",
+          "firstName": "Manuel",
+          "lastName": "Sailer",
+          "position": "Angriff",
+          "starting": false,
+          "minutesPlayed": 17,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        },
+        {
+          "slug": "maurice-wensch-225278",
+          "firstName": "Maurice",
+          "lastName": "Wensch",
+          "position": "Angriff",
+          "starting": false,
+          "minutesPlayed": 0,
+          "goals": 0,
+          "yellowCard": 0,
+          "redCard": 0
+        }
+      ]
+    },
     {
       "id": 15062146,
       "slug": "heidelberger-sc-m1-fc-rot-m1-261030",
@@ -805,7 +992,7 @@
           "lastName": "Müller",
           "position": "Mittelfeld",
           "starting": true,
-          "minutesPlayed": 81,
+          "minutesPlayed": 80,
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
@@ -849,7 +1036,7 @@
           "lastName": "Durst",
           "position": "Abwehr",
           "starting": false,
-          "minutesPlayed": 9,
+          "minutesPlayed": 10,
           "goals": 0,
           "yellowCard": 0,
           "redCard": 0
